@@ -1,0 +1,52 @@
+import tkinter as tk
+import pyshorteners as pys
+import csv
+import tkinter.messagebox as messagebox
+
+def copy_url():
+    url = shorturl_entry.get()
+    main.clipboard_clear()
+    main.clipboard_append(url)
+    messagebox.showinfo("URL Copied", "The shortened URL has been copied successfully")
+
+def shorten():
+    shortener = pys.Shortener()
+    long_url = longurl_entry.get()
+    short_url = shortener.tinyurl.short(long_url)
+    shorturl_entry.insert(0, short_url)
+    
+    outputurl_label.config(text=short_url, fg="blue", cursor="hand2")
+    outputurl_label.bind("<Button-1>", lambda e: open_link())
+    outputurl_label.pack()
+
+    copy_button = tk.Button(main, text="Copy URL", command=lambda: copy_url())
+    copy_button.pack()
+
+    with open('Original_URL.csv', 'a', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow([long_url])
+
+    with open('Shortened_URL.csv', 'a', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow([short_url])
+
+main = tk.Tk()
+main.title("URL Shortener")
+main.geometry("600x300")
+
+longurl_label = tk.Label(main, text="Enter Original URL")
+longurl_entry = tk.Entry(main)
+button = tk.Button(main, text="Shorten URL", command=shorten)
+shorturl_label = tk.Label(main, text="Output URL")
+shorturl_entry = tk.Entry(main)
+
+outputurl_label = tk.Label(main, text="", fg="blue", cursor="hand2")
+
+longurl_label.pack()
+longurl_entry.pack()
+button.pack()
+shorturl_label.pack()
+shorturl_entry.pack()
+
+
+main.mainloop()
